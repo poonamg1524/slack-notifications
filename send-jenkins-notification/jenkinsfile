@@ -7,7 +7,10 @@ pipeline {
                 checkout scm: [
                     $class: 'GitSCM',
                     branches: [[name: '*/main']],
-                    userRemoteConfigs: [[credentialsId: 'github-ssh-key', url: 'git@github.com:poonamg1524/slack-notifications.git']]
+                    userRemoteConfigs: [[
+                        credentialsId: 'github-https-token',
+                        url: 'https://github.com/poonamg1524/slack-notifications.git'
+                    ]]
                 ]
             }
         }
@@ -26,9 +29,14 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                echo 'Done!'
-                sh "go run send-jenkins-notification/send-jenkins-notification.go ${BUILD_URL} ${currentBuild.currentBuildResult} ${BUILD_NUMBER} ${JOB_NAME}"
+                echo 'Deploying code'
             }
+        }
+    }
+
+    post {
+        always {
+            sh "go run send-jenkins-notification/send-jenkins-notification.go ${BUILD_URL} ${currentBuild.currentResult} ${BUILD_NUMBER} ${JOB_NAME}"
         }
     }
 }
