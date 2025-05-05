@@ -4,11 +4,10 @@ pipeline {
     stages {
         stage('Check out codebase') {
             steps {
-                // Note: 'checkout scm' uses the pipeline-defined repo, remove if unnecessary
                 checkout([$class: 'GitSCM', 
                           branches: [[name: '*/main']],
                           userRemoteConfigs: [[
-                              credentialsId: 'github-ssh-key', // Ensure this is configured properly
+                              credentialsId: 'github-ssh-key', // Ensure this credential exists in Jenkins
                               url: 'https://github.com/poonamg1524/slack-notifications.git'
                           ]]
                 ])
@@ -18,8 +17,7 @@ pipeline {
         stage('Build') {
             steps {
                 echo 'Building Codebase'
-                // Use `bat` if there's a real build step like compiling
-                // bat 'go build .'
+                // Example: bat 'go build .'
             }
         }
 
@@ -34,8 +32,8 @@ pipeline {
             steps {
                 echo 'Done!'
 
-                // Use bat instead of sh for Windows
-                bat "go run send-jenkins-notification\\slack-notification.go %BUILD_URL% %currentBuild.currentBuildResult% %BUILD_NUMBER% %JOB_NAME%"
+                // Proper environment variable usage for Windows in Jenkins
+                bat "go run send-jenkins-notification\\slack-notification.go ${env.BUILD_URL} ${currentBuild.currentResult} ${env.BUILD_NUMBER} ${env.JOB_NAME}"
             }
         }
     }
