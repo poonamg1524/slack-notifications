@@ -4,39 +4,39 @@ pipeline {
     stages {
         stage('Check out codebase') {
             steps {
-                checkout scm: [
-                    $class: 'GitSCM',
-                    branches: [[name: '*/main']],
-                    userRemoteConfigs: [[
-                        credentialsId: 'github-https-token',
-                        url: 'https://github.com/poonamg1524/slack-notifications.git'
-                    ]]
-                ]
+                // Note: 'checkout scm' uses the pipeline-defined repo, remove if unnecessary
+                checkout([$class: 'GitSCM', 
+                          branches: [[name: '*/main']],
+                          userRemoteConfigs: [[
+                              credentialsId: 'github-ssh-key', // Ensure this is configured properly
+                              url: 'https://github.com/poonamg1524/slack-notifications.git'
+                          ]]
+                ])
             }
         }
 
         stage('Build') {
             steps {
                 echo 'Building Codebase'
+                // Use `bat` if there's a real build step like compiling
+                // bat 'go build .'
             }
         }
 
         stage('Test') {
             steps {
-                echo 'Running Test on changes'
+                echo 'Running Tests on changes'
+                // Example: bat 'go test ./...'
             }
         }
 
         stage('Deploy') {
             steps {
-                echo 'Deploying code'
-            }
-        }
-    }
+                echo 'Done!'
 
-    post {
-        always {
-            sh "go run send-jenkins-notification/send-jenkins-notification.go ${BUILD_URL} ${currentBuild.currentResult} ${BUILD_NUMBER} ${JOB_NAME}"
+                // Use bat instead of sh for Windows
+                bat "go run send-jenkins-notification\\send-jenkins-notification.go %BUILD_URL% %currentBuild.currentBuildResult% %BUILD_NUMBER% %JOB_NAME%"
+            }
         }
     }
 }
