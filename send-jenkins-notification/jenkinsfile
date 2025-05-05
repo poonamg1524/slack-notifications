@@ -35,7 +35,7 @@ pipeline {
                 echo 'Done!'
 
                 // Use bat instead of sh for Windows
-                bat "go run send-jenkins-notification\\send-jenkins-notification.go %BUILD_URL% %currentBuild.currentBuildResult% %BUILD_NUMBER% %JOB_NAME%"
+                bat "go run send-jenkins-notification\\slack-notification.go %BUILD_URL% %currentBuild.currentBuildResult% %BUILD_NUMBER% %JOB_NAME%"
             }
         }
     }
