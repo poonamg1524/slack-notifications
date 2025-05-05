@@ -1,0 +1,34 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Check out codebase'){
+            steps{
+                checkout  scm:[$class:'GitSCM', 
+                            branches:[[name: '*/main']],
+                            userRemoteConfig:[[credentialsId:'github-ssh-key',
+                                            url: 'git@github.com:poonamg1524/slack-notifications.git']]]
+            }  
+
+            stage('Build') {
+                steps {
+                    ech 'Building Codebase'
+                }
+            }      
+
+            stage('Test') {
+                steps {
+                    echo 'Running Test on changes'
+                }
+            }
+
+            stage('Deploy') {
+                steps{
+                    echo 'Done!'
+
+                    sh "go run send-jenkins-notification/send-jenkins-notification.go ${BUILD_URL} ${currentBuild.currentBuildResult} ${BUILD_NUMBER} ${JOB_NAME}"
+                }
+            }
+        }
+    }
+}
