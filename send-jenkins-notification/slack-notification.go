@@ -9,14 +9,20 @@ import (
 
 func main() {
 
-	err := godotenv.Load("E:/Web Tech/Go/slack-jenkins-go/.env")
-	if err != nil {
-		fmt.Println("Error loading .env:", err)
-	}
+	// err := godotenv.Load("E:/Web Tech/Go/slack-jenkins-go/.env")
+	// if err != nil {
+	// 	fmt.Println("Error loading .env:", err)
+	// }
 	args := os.Args[1:]
 	fmt.Println(args)
 
 	token := os.Getenv("SLACK_BOT_TOKEN")
+	// token := os.Getenv("SLACK_BOT_TOKEN")
+	if token == "" {
+		fmt.Println("Error: SLACK_BOT_TOKEN is not set in environment variables.")
+		return
+	}
+
 	api := slack.New(token)
 
 	//Introductory Message Components
