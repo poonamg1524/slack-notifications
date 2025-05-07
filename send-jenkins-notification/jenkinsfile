@@ -18,6 +18,7 @@ pipeline {
             steps {
                 echo 'Building Codebase'
                 // Example: bat 'go build .'
+                bat 'go build .'
             }
         }
 
@@ -25,6 +26,7 @@ pipeline {
             steps {
                 echo 'Running Tests on changes'
                 // Example: bat 'go test ./...'
+                bat 'go test ./...'
             }
         }
 
@@ -32,8 +34,16 @@ pipeline {
             steps {
                 echo 'Done!'
 
-                // Proper environment variable usage for Windows in Jenkins
-                bat "go run send-jenkins-notification\\slack-notification.go ${env.BUILD_URL} ${currentBuild.currentResult} ${env.BUILD_NUMBER} ${env.JOB_NAME}"
+                // Updated curl command 
+                // // bat "go run send-jenkins-notification\\slack-notification.go ${env.BUILD_URL} c ${env.BUILD_NUMBER} ${env.JOB_NAME}"
+                bat """
+                curl --header "Content-Type: application/json" --request POST --data "{
+                    \"buildurl\": \"${env.BUILD_URL}\",
+                    \"buildresult\": \"${currentBuild.currentResult}\",
+                    \"buildnumber\": \"${env.BUILD_NUMBER}\",
+                    \"jobname\": \"${JOB_NAME}\"
+                }" http://localhost:8091/sendSlackMessage
+                """
             }
         }
     }
